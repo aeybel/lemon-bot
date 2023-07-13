@@ -1,8 +1,11 @@
-// Require the necessary discord.js classes
+// Require necessary node modules
 const fs = require('node:fs')
 const path = require('node:path')
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+const { token, channelId } = require('./config.json');
+
+// require my modules
+const { dailiesJob } = require('./dailies.js')
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -28,6 +31,9 @@ for (const file of commandFiles) {
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
+    
+    // start the cron job to send dailies message
+    dailiesJob(client, channelId).start()
 });
 
 client.on(Events.InteractionCreate, async interaction => {
