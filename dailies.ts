@@ -6,7 +6,7 @@
  * This allows the user to quickly view goal adherance.
  */
 
-const cron = require('cron')
+import cron = require('cron')
 
 function sendDailies(client, channelId) {
     const channel = client.channels.cache.get(channelId)
@@ -17,4 +17,4 @@ function sendDailies(client, channelId) {
 
 const dailiesJob = (client, channelId) => new cron.CronJob("*/5 * * * * *", () => sendDailies(client, channelId))
 
-module.exports = { dailiesJob }
+export { dailiesJob }
