@@ -8,8 +8,9 @@
 
 import cron = require('cron')
 import { BasicButton } from './messages/daily'
+import { channelId } from './config.json';
 
-function sendDailies(client, channelId) {
+function sendDailies(client) {
     const channel = client.channels.cache.get(channelId)
     var currentTime = new Date()
     console.log("sending dailies at", currentTime.toString())
@@ -19,6 +20,6 @@ function sendDailies(client, channelId) {
     })
 }
 
-const dailiesJob = (client, channelId) => new cron.CronJob("*/5 * * * * *", () => sendDailies(client, channelId))
+const dailiesJob = (client) => new cron.CronJob("*/5 * * * * *", () => sendDailies(client))
 
 export { dailiesJob }
