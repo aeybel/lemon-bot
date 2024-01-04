@@ -6,25 +6,38 @@
  */
 
 import cron = require('cron')
-import { channelId } from './config.json';
+import { channelId, archiveChannelId } from './config.json';
 import { Client, Collection, Message, Snowflake } from 'discord.js';
 
 function hasReaction(msg: Message) {
     return msg.reactions.cache.filter(react => react.count > 0).size > 0;
 }
 
+async function sendMessage(client, msg: Message) {
+    const channel = client.channels.cache.get(archiveChannelId)
+    await channel.send({
+        content: `${msg.content}\nArchived ${new Date()}`
+    })
+}
+
 async function readReacts(client) {
     console.log("tick")
     var currentTime = new Date()
     const channel = client.channels.cache.get(channelId)
-    let messages: Collection<Snowflake, Message> = await channel.messages.fetch({ limit: 10 })
+    let messages: Collection<Snowflake, Message> = await channel.messages.fetch({ limit: 50 })
     messages.forEach(msg => {
         if (hasReaction(msg)) {
             console.log("This message has a reaction!")
+            // send a message containing this text to another channel
+            try {
+                sendMessage(client, msg).then(_ => msg.delete())
+            } catch (err) {
+                console.log("There was an error: " + err)
+            }
         }
     });
 }
 
-const todoJob = (client: Client) => new cron.CronJob("*/2 * * * * *", () => readReacts(client))
+const todoJob = (client: Client) => new cron.CronJob("*/30 * * * * *", () => readReacts(client))
 
 export { todoJob }
